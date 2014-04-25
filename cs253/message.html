@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+   <title>Leave a message!</title>
+   <link rel="stylesheet" type="text/css" href="/css/main.css">
+   <link rel="stylesheet" type="text/css" href="/css/message.css">
+</head>
+
+<body>
+   <div class="sidebar">
+      <h2>
+         <ul>
+            <li><a href="/cs253/rot13"> Rot13 </a></li>
+            <li><a href="/cs253/learntocode">You should learn to code</a></li>
+            <li><a href="/cs253/signup">Sign up</a></li>
+            <li><a href="/cs253/message">Leave me a message!</a></li>
+            <br>
+            <li><a href="/">Main page</a></li>
+         </ul>
+      </h2>
+   </div>
+   <div class="main">
+      <h1>Leave a message!</h1>
+      <h2>This page uses database (GQL)</h2>
+
+      <form method="post">
+         <label>
+            <div>title</div>
+            <input type="text" name="title">
+         </label>
+
+         <label>
+            <div>message</div>
+            <textarea name="message"></textarea>
+         </label>
+
+         <div class="error">{{error}}</div>
+
+         <input type="submit">
+         <a href="/cs253"> Go back </a>
+      </form>
+
+      <hr>
+
+      {% for message in messages %}
+      <div class="message">
+         <div class="message-title">{{message.title}}</div>
+         <pre class="message-body">{{message.message}}</pre>
+      </div>
+      {% endfor %}
+      
+   </body>
+</div>
+</html>

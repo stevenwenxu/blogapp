@@ -1,0 +1,38 @@
+div.sidebar
+{
+   position: fixed;
+   display: block;
+   font-size: 14px;
+   width: 230px;
+   height: 100%;
+   padding: 10px;
+   line-height: 30px;
+   background-color: #b0c4de;
+}
+div.main
+{
+   margin-left: 280px;
+   font-family: sans-serif;
+   padding: 10px;
+}
+div.main-center
+{
+   font-size: 40px;
+   text-align: center;
+}
+div.main-body
+{
+   font-size: 20px;
+}
+ul
+{
+   list-style-type:none;
+   margin:0;
+   padding:0;
+   overflow:hidden;
+}
+.lastupdate
+{
+   position: absolute;
+   bottom: 0;
+}

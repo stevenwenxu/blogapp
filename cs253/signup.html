@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <title>Signup</title>
+   <style type="text/css">
+      .label {text-align: right}
+      .error {color: red}
+   </style>
+   <link rel="stylesheet" type="text/css" href="/css/main.css">
+</head>
+<body>
+   <div class="sidebar">
+      <h2>
+         <ul>
+            <li><a href="/cs253/rot13"> Rot13 </a></li>
+            <li><a href="/cs253/learntocode">You should learn to code</a></li>
+            <li><a href="/cs253/signup">Sign up</a></li>
+            <li><a href="/cs253/message">Leave me a message!</a></li>
+            <br>
+            <li><a href="/">Main page</a></li>
+         </ul>
+      </h2>
+   </div>
+   <div class="main">
+      <div>
+         <h2>Sign Up</h2>
+         <h3>
+            Specifications and effects come <b>later</b> but you can try it out for fun
+         </h3>
+      </div>
+      <form method="post" action="/cs253/signup">
+         <table>
+            <tr>
+               <td class = "label">Username</td>
+               <td><input type="text" name="username" value="{{username}}"></td>
+               <td class = "error">{{nameerr}}</td>
+            </tr>
+            <tr>
+               <td class = "label">Password</td>
+               <td><input type="password" name="password" value="{{password}}"></td>
+               <td class = "error">{{passerr}}</td>
+            </tr>
+            <tr>
+               <td class = "label">Verify Password</td>
+               <td><input type="password" name="verify" value="{{verify}}"></td>
+               <td class = "error">{{matcherr}}</td>
+            </tr>
+            <tr>
+               <td class = "label">Email (optional)</td>
+               <td><input type="text" name="email" value="{{email}}"></td>
+               <td class = "error">{{emailerr}}</td>
+            </tr>
+         </table>
+         <input type="submit">
+      </form>
+      <p> <a href="/cs253"> Go back </a> </p>
+   </div>
+</body>
+</html>
