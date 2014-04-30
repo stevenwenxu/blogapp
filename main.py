@@ -24,6 +24,9 @@ from google.appengine.ext import db
 template_dir = os.path.join(os.path.dirname(__file__), '')
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir), autoescape = True)
 
+USER_RE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
+PASS_RE = re.compile(r"^.{3,20}$")
+EMAIL_RE = re.compile(r"^[\S]+@[\S]+\.[\S]+$")
 
 def rot13letter(l):
   if l >= 'a' and l <= 'z':
@@ -72,10 +75,6 @@ class Rot13Handler(Handler):
 class YouTubeHandler(Handler):
   def get(self):
     self.render("/cs253/learntocode.html")
-
-USER_RE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
-PASS_RE = re.compile(r"^.{3,20}$")
-EMAIL_RE = re.compile(r"^[\S]+@[\S]+\.[\S]+$")
 
 class SignUpHandler(Handler):
   def write_form(self, username, password, verify, email, nameerr, passerr, matcherr, emailerr):
@@ -141,6 +140,59 @@ class MessageHandler(Handler):
       error = "You need both a title and message!"
       self.render_message(title, message, error)
 
+class ResumeHandler(Handler):
+  def get(self):
+    self.render("/html/resume.html")
+
+class TechnicalHandler(Handler):
+  def get(self):
+    self.render("/html/technical.html")
+    
+class PEulerHandler(Handler):
+  def get(self):
+    self.render("/html/peuler.html")
+
+class CreditCCHandler(Handler):
+  def get(self):
+    self.render("/html/creditcard.html")
+
+class BlogPost(db.Model):
+  subject = db.StringProperty(required = True)
+  content = db.TextProperty(required = True)
+  created = db.DateTimeProperty(auto_now_add = True)
+  last_modified = db.DateTimeProperty(auto_now = True)
+
+class BlogHandler(Handler):
+  def render_blog(self, subject="", content="", error=""):
+    blogposts = db.GqlQuery("SELECT * from BlogPost ORDER BY created DESC LIMIT 10")
+    self.render("/html/blog.html", subject=subject, content=content, error=error, blogposts=blogposts)
+  def get(self):
+    self.render_blog()
+
+class NewPostHandler(Handler):
+  def get(self):
+    self.render("/html/newpost.html")
+  def post(self):
+    subject = self.request.get("subject")
+    content = self.request.get("content")
+    if subject and content:
+      a = BlogPost(subject = subject, content = content)
+      a.put()
+      self.redirect("/blog/%s" % str(a.key().id()))
+    else:
+      error = "You need both subject and content!"
+      self.render("/html/newpost.html", subject=subject, content=content, error=error)
+
+class PostPageHandler(Handler):
+  def get(self, post_id):
+    key = db.Key.from_path("BlogPost", int(post_id))
+    post = db.get(key)
+    if not post: #404
+      self.redirect("/blog")
+      return
+    self.render("/html/permanent.html", entry=post)
+
+
 app = webapp2.WSGIApplication([
   ('/', MainHandler),
   ('/cs253', CS253Handler),
@@ -148,5 +200,12 @@ app = webapp2.WSGIApplication([
   ('/cs253/learntocode', YouTubeHandler),
   ('/cs253/signup', SignUpHandler),
   ('/cs253/welcome',WelcomeHandler),
-  ('/cs253/message', MessageHandler)
+  ('/cs253/message', MessageHandler),
+  ('/technical', TechnicalHandler),
+  ('/resume', ResumeHandler),
+  ('/blog', BlogHandler),
+  ('/blog/newpost', NewPostHandler),
+  ('/blog/([0-9]+)', PostPageHandler),
+  ('/peuler', PEulerHandler),
+  ('/credit-card', CreditCCHandler)
   ], debug=True)

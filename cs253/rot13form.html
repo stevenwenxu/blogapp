@@ -7,19 +7,18 @@
 <body>
    <div class="sidebar">
       <h2>
-         <ul>
+         <ul class="sb">
             <li><a href="/cs253/rot13"> Rot13 </a></li>
-            <li><a href="/cs253/learntocode">You should learn to code</a></li>
+            <li><a href="/cs253/learntocode">Learn to code</a></li>
             <li><a href="/cs253/signup">Sign up</a></li>
             <li><a href="/cs253/message">Leave me a message!</a></li>
             <br>
-            <li><a href="/">Main page</a></li>
+            <li><a href="/cs253">Go Back</a></li>
          </ul>
       </h2>
    </div>
    <div class="main">
       <form method="post" action="/cs253/rot13">
-
          <div> 
             <h1> Enter some text to rot13! </h1> 
             <h2> <a href="http://en.wikipedia.org/wiki/ROT13" target="_blank">What is ROT13? </a> </h2> 
@@ -28,7 +27,6 @@
          <textarea name="text" style="height: 100px; width: 400px;">{{text}}</textarea>
          <br><br><br>
          <input type='submit'>
-         <p><a href="/cs253">Go back</a></p>
       </form>
    </div>
 </body>
