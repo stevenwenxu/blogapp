@@ -16,9 +16,13 @@
 #
 
 import webapp2
-import re
+import re # regex
 import jinja2
-import os
+import os # template_dir
+import hashlib # hash, salt, md5 etc
+import hmac # hmac even better encryption
+import random # ramdom salt
+import string
 from google.appengine.ext import db
 
 template_dir = os.path.join(os.path.dirname(__file__), '')
@@ -46,6 +50,37 @@ def rot13(text):
 #         s = s.replace(a, b)
 #   return s
 
+SECRET = "waterlooo"
+
+# using hashlib md5 or even better: hmac with a secret string mixed with string s
+def hash_str(s):
+  # return hashlib.md5(s).hexdigest()
+  return hmac.new(SECRET, s).hexdigest()
+
+def make_secure_val(s):
+  return "%s|%s" % (s, hash_str(s))
+
+def check_secure_val(h):
+  s = h.split("|")[0]
+  if make_secure_val(s) == h:
+    return s
+    
+# returns a hashed password using sha256 of the format: 
+# HASH(name + pw + salt),salt
+
+def make_salt():
+  return "".join(random.choice(string.letters) for x in xrange(5))
+
+def make_pw_hash(name, pw):
+  salt = make_salt()
+  hashh = hashlib.sha256(name + pw + salt).hexdigest()
+  return "%s,%s" % (hashh, salt)
+
+def valid_pw(name, pw, h):
+  check_hash = h.split(",")[0]
+  check_salt = h.split(",")[1]
+  return check_hash == hashlib.sha256(name + pw + check_salt).hexdigest()
+
 # using jinja template to simplify code
 class Handler(webapp2.RequestHandler):
   def write(self, *a, **kw):
@@ -59,6 +94,24 @@ class Handler(webapp2.RequestHandler):
 class MainHandler(Handler):
   def get(self):
     self.render("/html/welcome.html")
+
+    # visits = 0
+    # visit_cookie_str = self.request.cookies.get('visits')
+    # if visit_cookie_str:
+    #   cookie_val = check_secure_val(visit_cookie_str)
+    #   if cookie_val:
+    #     visits = int(cookie_val)
+
+    # visits += 1
+
+    # new_cookie_val = make_secure_val(str(visits))
+
+    # self.response.headers.add_header("Set-Cookie", "visits=%s" % new_cookie_val)
+
+    # if visits > 10:
+    #   self.write("You are my best friend! You've been here %s times!" % visits)
+    # else:
+    #   self.write("You've been here %s times!" % visits)
 
 class CS253Handler(Handler):
   def get(self):
@@ -102,18 +155,33 @@ class SignUpHandler(Handler):
     if email and not EMAIL_RE.match(email):
       emailerr = "That's not a valid email."
 
+    raw_name = self.request.cookies.get("name")
+    if raw_name:
+      that_name = raw_name.split("|")[0]
+      if that_name == username:
+        nameerr = "The user already exists"
+
     if (nameerr or passerr or matcherr or emailerr):
       self.render("/cs253/signup.html", username = username, nameerr = nameerr, password = "", passerr = passerr, verify = "", matcherr = matcherr, email = email, emailerr = emailerr)
     else:
-      self.redirect("/cs253/welcome?username=" + username)
+      name = username
+      salted_name = make_secure_val(str(name))
+      self.response.headers.add_header("Set-Cookie", "name=%s" % salted_name)
+      self.redirect("/cs253/welcome")
 
 class WelcomeHandler(Handler):
   def get(self):
-    username = self.request.get("username")
-    if USER_RE.match(username):
-      self.render("<h1>Welcome, {{username}}!</h1>", username = username)
+    raw_name = self.request.cookies.get("name")
+    if raw_name:
+      cookie_val = check_secure_val(raw_name)
+      if cookie_val:
+        username = str(cookie_val)
+        self.write("<h1>Welcome, %s!</h1>" % username)
+      else:
+        self.redirect("/cs253/signup")
     else:
       self.redirect("/cs253/signup")
+    
 
 class Message(db.Model):
   title = db.StringProperty(required = True)
