@@ -232,7 +232,7 @@ class BlogPost(db.Model):
 
 class BlogHandler(Handler):
   def render_blog(self, subject="", content="", error=""):
-    blogposts = db.GqlQuery("SELECT * from BlogPost ORDER BY created DESC LIMIT 10")
+    blogposts = db.GqlQuery("SELECT * from BlogPost ORDER BY created DESC LIMIT 30")
     self.render("/html/blog.html", subject=subject, content=content, error=error, blogposts=blogposts)
   def get(self):
     self.render_blog()
